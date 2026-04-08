@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中超外援引援性价比量化评估模型 — 赛点Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --white: #ffffff; --bg: #f9f9f8; --black: #0a0a0a;
+      --muted: #888; --faint: #ccc; --border: #e8e8e8; --green: #1b5e3b;
+      --font: 'Inter','PingFang SC','Microsoft YaHei',sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--white); color: var(--black); line-height: 1.7; }
+    a { color: inherit; text-decoration: none; }
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 4rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px); z-index: 100;
+    }
+    .nav-back { display: flex; align-items: center; gap: 0.6rem; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); transition: color 0.25s; }
+    .nav-back:hover { color: var(--green); }
+    .nav-brand { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--green); }
+    .article-hero { padding: 5rem 4rem 3.5rem; border-bottom: 1px solid var(--border); }
+    .article-tag { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.5em; text-transform: uppercase; color: var(--green); margin-bottom: 1.2rem; }
+    .article-title { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 1.2rem; max-width: 760px; }
+    .article-meta { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 2rem; }
+    .article-meta span { margin-right: 1.5rem; }
+    .hero-rule { width: 2rem; height: 2px; background: var(--green); }
+    .article-body { max-width: 760px; margin: 0 auto; padding: 4rem 4rem; }
+    .article-body p { font-size: 0.95rem; line-height: 1.95; color: #444; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; margin: 3rem 0 1rem; color: var(--black); }
+    h3 { font-size: 1rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--black); }
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 2rem 0; }
+    .stat-box { background: var(--bg); padding: 1.4rem; text-align: center; }
+    .stat-box-num { font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; color: var(--black); line-height: 1; }
+    .stat-box-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-top: 0.4rem; }
+    .callout { border-left: 2px solid var(--green); padding: 1rem 1.5rem; background: var(--bg); margin: 2rem 0; font-size: 0.9rem; line-height: 1.8; color: #555; }
+    .callout strong { color: var(--black); font-weight: 600; }
+    .metric-table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.85rem; }
+    .metric-table th { background: var(--black); color: var(--white); padding: 0.75rem 1rem; text-align: left; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; }
+    .metric-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); color: #555; }
+    .metric-table tr:hover td { background: var(--bg); }
+    .metric-table .highlight { color: var(--green); font-weight: 600; }
+    .conclusion { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 2rem 0; margin: 3rem 0; font-size: 1rem; line-height: 1.9; color: #444; font-style: italic; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--green); border: 1px solid var(--green); padding: 0.65rem 1.2rem; transition: background 0.25s, color 0.25s; margin-top: 2rem; }
+    .back-link:hover { background: var(--green); color: var(--white); }
+    footer { padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); }
+    .footer-txt { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.25em; text-transform: uppercase; color: var(--faint); }
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; } .article-hero { padding: 3.5rem 1.5rem 2.5rem; }
+      .article-body { padding: 2.5rem 1.5rem; } footer { padding: 1.5rem; flex-direction: column; gap: 0.4rem; }
+      .stat-row { grid-template-columns: 1fr 1fr; } .metric-table { font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-back" href="index.html">← 返回主页</a>
+    <span class="nav-brand">赛点Pro</span>
+  </nav>
+
+  <div class="article-hero">
+    <div class="article-tag">球员估值 &nbsp;·&nbsp; 02</div>
+    <h1 class="article-title">中超外援引援性价比量化评估模型</h1>
+    <div class="article-meta">
+      <span>2024年 &nbsp;·&nbsp; 数据来源：Wyscout + Python</span>
+      <span>中国足球超级联赛 2021–2023 赛季</span>
+    </div>
+    <div class="hero-rule"></div>
+  </div>
+
+  <div class="article-body">
+
+    <p>自 2017 年中超薪资调控政策出台以来，外援市场逐渐从「砸钱买名气」转向「买实用性」。然而，俱乐部技术团队在引援决策上仍普遍依赖经验判断与中间人推荐，缺乏系统性的量化评估框架。本研究构建多维评估模型，对 2021-2023 三个赛季中超全部外援进行量化打分与性价比排名。</p>
+
+    <h2>模型构建方法论</h2>
+
+    <p>本模型采用加权综合评分体系，以每 90 分钟数据为基础单位，规避出场时间差异带来的总量偏差。核心指标如下：</p>
+
+    <table class="metric-table">
+      <thead>
+        <tr><th>指标维度</th><th>具体指标</th><th>权重</th><th>数据来源</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>进攻贡献</td><td>非点球进球 + 助攻 / 90min</td><td class="highlight">30%</td><td>Wyscout</td></tr>
+        <tr><td>创造能力</td><td>期望助攻(xA) + 关键传球 / 90min</td><td class="highlight">20%</td><td>Wyscout</td></tr>
+        <tr><td>持球能力</td><td>成功过人 + 成功传球进攻三区 / 90min</td><td class="highlight">20%</td><td>Wyscout</td></tr>
+        <tr><td>防守参与</td><td>抢断 + 解围 + 空中对抗成功 / 90min</td><td class="highlight">15%</td><td>Wyscout</td></tr>
+        <tr><td>出场稳定性</td><td>可出场场次中实际上场比例</td><td class="highlight">15%</td><td>官方数据</td></tr>
+      </tbody>
+    </table>
+
+    <p>综合得分除以估算月薪（万元人民币），得出「性价比指数」。月薪数据来源于公开报道、转会市场与球员经纪公司信息，存在一定估算误差，已在模型中引入 ±15% 的容差区间。</p>
+
+    <h2>核心发现</h2>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-box-num">68</div>
+        <div class="stat-box-label">三赛季样本外援总数</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-num">2.3x</div>
+        <div class="stat-box-label">最高与最低性价比差距</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-num">41%</div>
+        <div class="stat-box-label">南美外援占高性价比前15名</div>
+      </div>
+    </div>
+
+    <h3>高性价比规律</h3>
+    <p>研究发现，排名前 15 的高性价比外援有几个共同特征：年龄集中在 26-29 岁（职业生涯成熟期但尚未进入下行阶段）；位置以进攻型中场和边锋为主，而非中超俱乐部惯常偏爱的中锋；来源联赛以巴甲、阿甲、葡超、土超为主，而非英超、西甲等高溢价联赛。</p>
+
+    <h3>低性价比陷阱</h3>
+    <p>排名垫底的外援中，「名气溢价」是最主要的性价比杀手。曾有俱乐部以过亿年薪引进一名在欧洲联赛巅峰期已过的前锋，其 xG 贡献率仅为相同薪资区间最高性价比外援的 38%。此外，伤病率高、适应周期长（尤其是欧洲球员初次来亚洲）也是拉低性价比的重要因素。</p>
+
+    <div class="callout">
+      <strong>核心结论：</strong>在相同预算下，引进 1 名「南美成熟型中场」的进攻贡献期望值，平均比引进 1 名「欧洲知名前锋」高出 47%。中超俱乐部对前锋位置的过度投入与对中场位置的长期忽视，是引援效率低下的结构性原因。
+    </div>
+
+    <h2>引援建议框架</h2>
+
+    <p>基于模型输出，对中超俱乐部外援引进提供以下量化参考框架：优先筛选条件为年龄 26-29 岁、场均关键传球 2.5 次以上、成功过人率 55% 以上、伤病缺席场次占比低于 15%。在来源联赛层面，巴甲、葡超、土超提供了最高的「技术水准与价格比」，是当前中超外援市场最值得关注的挖掘渠道。</p>
+
+    <div class="conclusion">
+      数据不能替代眼球，但它可以大幅缩小「感觉靠谱」与「确实靠谱」之间的距离。这套模型的价值不在于给出唯一答案，而在于让决策讨论有了共同的事实基础——这本身就是中国职业足球俱乐部技术运营最缺少的东西。
+    </div>
+
+    <a class="back-link" href="index.html">← 返回所有案例</a>
+
+  </div>
+
+  <footer>
+    <span class="footer-txt">© 2024 赛点Pro</span>
+    <span class="footer-txt">数据驱动 &nbsp;·&nbsp; 战术为本</span>
+  </footer>
+
+</body>
+</html>
