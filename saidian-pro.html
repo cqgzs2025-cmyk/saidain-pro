@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>赛点Pro — Football Data Analyst</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --white:   #ffffff;
+      --bg:      #f9f9f8;
+      --black:   #0a0a0a;
+      --muted:   #888888;
+      --faint:   #cccccc;
+      --border:  #e8e8e8;
+      --green:   #1b5e3b;
+      --font:    'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== NAV ===== */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 4rem;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-mark {
+      width: 30px;
+      height: 30px;
+      border: 1.5px solid var(--green);
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-mark::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid var(--green);
+      border-radius: 50%;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.25s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--black); }
+
+    /* ===== HERO ===== */
+    .hero {
+      padding: 7rem 4rem 5rem;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-pitch-bg {
+      position: absolute;
+      right: -4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.04;
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-name {
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+    .hero-name span { color: var(--green); }
+
+    .hero-sub {
+      font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 3.5rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .hero-stats {
+      display: flex;
+      width: fit-content;
+      border: 1px solid var(--border);
+      animation: fadeUp 0.8s 0.35s ease both;
+    }
+    .stat {
+      padding: 1.1rem 2rem;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 4rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--faint);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+    .hero-scroll-hint::before {
+      content: '';
+      width: 1.8rem;
+      height: 1px;
+      background: var(--faint);
+    }
+
+    /* ===== SHARED SECTION STYLES ===== */
+    section { padding: 5rem 4rem; border-bottom: 1px solid var(--border); }
+
+    .sec-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 0.75rem;
+    }
+    .sec-title {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .rule {
+      width: 2rem;
+      height: 2px;
+      background: var(--green);
+      margin: 1.2rem 0 2rem;
+    }
+
+    /* ===== ABOUT ===== */
+    #about { background: var(--white); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    .about-text {
+      font-size: 0.88rem;
+      line-height: 2;
+      color: #555;
+    }
+
+    .about-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 1.5rem;
+    }
+    .tag {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .tag:hover { border-color: var(--green); color: var(--green); }
+
+    .pitch-card {
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1.4 / 1;
+    }
+
+    /* ===== TOOLS ===== */
+    #tools { background: var(--bg); }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .tool-item {
+      background: var(--bg);
+      padding: 1.4rem;
+      transition: background 0.25s;
+    }
+    .tool-item:hover { background: var(--white); }
+    .tool-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-bottom: 0.75rem;
+    }
+    .tool-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--black);
+      margin-bottom: 0.2rem;
+    }
+    .tool-cat {
+      font-size: 0.62rem;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ===== ANALYSIS ===== */
+    #analysis { background: var(--white); }
+
+    .analysis-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .analysis-item {
+      background: var(--white);
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.25s;
+      cursor: pointer;
+    }
+    .analysis-item:hover { background: var(--bg); }
+    .a-num {
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 0.1em;
+      min-width: 2rem;
+      flex-shrink: 0;
+    }
+    .a-body { flex: 1; margin: 0 1.5rem; }
+    .a-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 0.2rem;
+    }
+    .a-meta {
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .a-arrow {
+      font-size: 1rem;
+      color: var(--green);
+      opacity: 0.4;
+      flex-shrink: 0;
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .analysis-item:hover .a-arrow { opacity: 1; transform: translateX(5px); }
+
+    /* ===== CONTACT ===== */
+    #contact { background: var(--bg); }
+
+    .contact-inner { max-width: 560px; }
+    .contact-sub {
+      font-size: 0.88rem;
+      line-height: 1.9;
+      color: #666;
+      margin-bottom: 2.5rem;
+    }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .cta {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.4rem;
+      border: 1px solid var(--black);
+      color: var(--black);
+      cursor: pointer;
+      background: transparent;
+      transition: background 0.25s, color 0.25s, border-color 0.25s;
+    }
+    .cta:hover, .cta.primary {
+      background: var(--black);
+      color: var(--white);
+    }
+    .cta.primary:hover {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+    .footer-txt {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 2rem; }
+      .hero { padding: 5rem 2rem 4rem; }
+      section { padding: 4rem 2rem; }
+      footer { padding: 1.8rem 2rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .pitch-card { display: none; }
+      .tools-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-stats { flex-wrap: wrap; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.2rem; }
+      .hero { padding: 4rem 1.5rem 3rem; min-height: auto; }
+      section { padding: 3.5rem 1.5rem; }
+      footer { padding: 1.5rem; flex-direction: column; gap: 0.4rem; }
+      .hero-pitch-bg { display: none; }
+      .hero-scroll-hint { left: 1.5rem; }
+    }
+    @media (max-width: 420px) {
+      .nav-links { display: none; }
+      .tools-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== 导航栏 ===== -->
+  <nav>
+    <div class="nav-mark" aria-hidden="true"></div>
+    <ul class="nav-links">
+      <li><a href="#about">关于</a></li>
+      <li><a href="#tools">工具</a></li>
+      <li><a href="#analysis">分析</a></li>
+      <li><a href="#contact">联系</a></li>
+    </ul>
+  </nav>
+
+  <!-- ===== 英雄区 ===== -->
+  <section class="hero">
+    <svg class="hero-pitch-bg" width="520" height="340" viewBox="0 0 520 340" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="2" y="2" width="516" height="336" stroke="#000" stroke-width="2"/>
+      <line x1="260" y1="2" x2="260" y2="338" stroke="#000" stroke-width="1.5"/>
+      <circle cx="260" cy="170" r="55" stroke="#000" stroke-width="1.5"/>
+      <circle cx="260" cy="170" r="4" fill="#000"/>
+      <rect x="2" y="108" width="72" height="124" stroke="#000" stroke-width="1.5"/>
+      <rect x="446" y="108" width="72" height="124" stroke="#000" stroke-width="1.5"/>
+      <rect x="2" y="130" width="28" height="80" stroke="#000" stroke-width="1.5"/>
+      <rect x="490" y="130" width="28" height="80" stroke="#000" stroke-width="1.5"/>
+      <circle cx="100" cy="170" r="28" stroke="#000" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="420" cy="170" r="28" stroke="#000" stroke-width="1" stroke-dasharray="4 3"/>
+    </svg>
+
+    <div class="hero-eyebrow">Football Data Analyst</div>
+    <h1 class="hero-name">赛点<span>Pro</span></h1>
+    <p class="hero-sub">用专业拆解足球场上的事</p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">6+</div>
+        <div class="stat-label">年分析经验</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">500+</div>
+        <div class="stat-label">场次研究</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">8</div>
+        <div class="stat-label">专业工具</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">TOP 5</div>
+        <div class="stat-label">联赛覆盖</div>
+      </div>
+    </div>
+
+    <div class="hero-scroll-hint">向下滚动</div>
+  </section>
+
+  <!-- ===== 关于我 ===== -->
+  <section id="about">
+    <div class="sec-label reveal">关于</div>
+    <h2 class="sec-title reveal">背景与故事</h2>
+    <div class="rule reveal"></div>
+    <div class="about-grid reveal">
+      <div>
+        <p class="about-text">
+          从小痴迷足球战术，大学期间自学统计学与数据建模，毕业后进入体育科技公司从事数据产品研发，后转型为独立分析师。先后服务于职业俱乐部技术团队与体育媒体机构，深度参与过中超、欧冠及世界杯预选赛的赛前侦察与对手研究工作。
+          <br /><br />
+          如今运营《赛点Pro》独立平台，借助 Wyscout、StatsBomb、Python 与 Tableau 等专业工具，将比赛中肉眼难以捕捉的规律转化为清晰可读的战术图谱。相信数据不是终点，而是读懂足球的起点。
+        </p>
+        <div class="about-tags">
+          <span class="tag">战术建模</span>
+          <span class="tag">球员追踪</span>
+          <span class="tag">赛前侦察</span>
+          <span class="tag">数据可视化</span>
+          <span class="tag">运动科学</span>
+          <span class="tag">对手研究</span>
+        </div>
+      </div>
+      <div class="pitch-card">
+        <svg width="220" height="154" viewBox="0 0 320 224" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="316" height="220" stroke="#1b5e3b" stroke-width="1.5"/>
+          <line x1="160" y1="2" x2="160" y2="222" stroke="#1b5e3b" stroke-width="1"/>
+          <circle cx="160" cy="112" r="44" stroke="#1b5e3b" stroke-width="1"/>
+          <circle cx="160" cy="112" r="3.5" fill="#1b5e3b"/>
+          <rect x="2" y="70" width="54" height="84" stroke="#1b5e3b" stroke-width="1"/>
+          <rect x="264" y="70" width="54" height="84" stroke="#1b5e3b" stroke-width="1"/>
+          <!-- 战术点 -->
+          <circle cx="76" cy="78" r="4" fill="#0a0a0a"/>
+          <circle cx="76" cy="146" r="4" fill="#0a0a0a"/>
+          <circle cx="116" cy="112" r="4" fill="#0a0a0a"/>
+          <circle cx="46" cy="112" r="4" fill="#0a0a0a"/>
+          <circle cx="156" cy="68" r="4" fill="#1b5e3b"/>
+          <circle cx="200" cy="90" r="4" fill="#1b5e3b" opacity="0.5"/>
+          <circle cx="200" cy="134" r="4" fill="#1b5e3b" opacity="0.5"/>
+          <!-- 连线 -->
+          <line x1="76" y1="78" x2="116" y2="112" stroke="#0a0a0a" stroke-width="1" stroke-dasharray="5 3"/>
+          <line x1="76" y1="146" x2="116" y2="112" stroke="#0a0a0a" stroke-width="1" stroke-dasharray="5 3"/>
+          <line x1="46" y1="112" x2="116" y2="112" stroke="#0a0a0a" stroke-width="1" stroke-dasharray="5 3"/>
+          <line x1="116" y1="112" x2="156" y2="68" stroke="#1b5e3b" stroke-width="1.8"/>
+          <line x1="156" y1="68" x2="200" y2="90" stroke="#1b5e3b" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.6"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 工具矩阵 ===== -->
+  <section id="tools">
+    <div class="sec-label reveal">工具箱</div>
+    <h2 class="sec-title reveal">专业软件矩阵</h2>
+    <div class="rule reveal"></div>
+    <div class="tools-grid reveal">
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">Wyscout</div>
+        <div class="tool-cat">视频平台 / 数据库</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">StatsBomb</div>
+        <div class="tool-cat">事件级数据</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">InStat Scout</div>
+        <div class="tool-cat">对手侦察报告</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">Tableau</div>
+        <div class="tool-cat">数据可视化</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">Python</div>
+        <div class="tool-cat">建模 / mplsoccer</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">SkillCorner</div>
+        <div class="tool-cat">追踪数据 (Tracking)</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">Opta / FBref</div>
+        <div class="tool-cat">统计数据平台</div>
+      </div>
+      <div class="tool-item">
+        <div class="tool-dot"></div>
+        <div class="tool-name">HUDL Sportscode</div>
+        <div class="tool-cat">视频标注剪辑</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 分析案例 ===== -->
+  <section id="analysis">
+    <div class="sec-label reveal">分析案例</div>
+    <h2 class="sec-title reveal">代表作品</h2>
+    <div class="rule reveal"></div>
+    <div class="analysis-list reveal">
+      <div class="analysis-item">
+        <span class="a-num">01</span>
+        <div class="a-body">
+          <div class="a-title">曼城高位逼抢触发机制深度拆解</div>
+          <div class="a-meta">战术分析 &nbsp;·&nbsp; StatsBomb &nbsp;·&nbsp; 2024</div>
+        </div>
+        <span class="a-arrow">→</span>
+      </div>
+      <div class="analysis-item">
+        <span class="a-num">02</span>
+        <div class="a-body">
+          <div class="a-title">中超外援引援性价比量化评估模型</div>
+          <div class="a-meta">球员估值 &nbsp;·&nbsp; Python + Wyscout &nbsp;·&nbsp; 2024</div>
+        </div>
+        <span class="a-arrow">→</span>
+      </div>
+      <div class="analysis-item">
+        <span class="a-num">03</span>
+        <div class="a-body">
+          <div class="a-title">世界杯亚洲区预选赛传球网络可视化</div>
+          <div class="a-meta">数据可视化 &nbsp;·&nbsp; mplsoccer &nbsp;·&nbsp; 2023</div>
+        </div>
+        <span class="a-arrow">→</span>
+      </div>
+      <div class="analysis-item">
+        <span class="a-num">04</span>
+        <div class="a-body">
+          <div class="a-title">欧冠八强定位球得分模式研究报告</div>
+          <div class="a-meta">专项研究 &nbsp;·&nbsp; InStat + Tableau &nbsp;·&nbsp; 2023</div>
+        </div>
+        <span class="a-arrow">→</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 联系我 ===== -->
+  <section id="contact">
+    <div class="sec-label reveal">联系</div>
+    <h2 class="sec-title reveal">合作 / 投稿 / 咨询</h2>
+    <div class="rule reveal"></div>
+    <div class="contact-inner reveal">
+      <p class="contact-sub">
+        无论你是媒体机构、职业俱乐部、经纪公司，还是同样痴迷足球数据的独立研究者，都欢迎联系探讨。无论是定制化分析报告、独家内容授权，还是纯粹的技术交流，均可以对话。
+      </p>
+      <div class="cta-row">
+        <a href="mailto:cqgzs2025@gmail.com" class="cta primary">cqgzs2025@gmail.com</a>
+        <div class="cta">微信公众号：赛点Pro</div>
+        <div class="cta">抖音：赛点Pro</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 页脚 ===== -->
+  <footer>
+    <span class="footer-txt">© 2024 赛点Pro</span>
+    <span class="footer-txt">数据驱动 &nbsp;·&nbsp; 战术为本</span>
+  </footer>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    // 滚动入场动画
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('in'), (i % 5) * 80);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+
+    // 导航高亮
+    const secs = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      secs.forEach(s => { if (window.scrollY >= s.offsetTop - 140) cur = s.id; });
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + cur));
+    });
+  </script>
+
+</body>
+</html>
